@@ -35,7 +35,7 @@ public class UsuarioDTO implements Serializable {
 	@ToString.Exclude
 	private List<ProductoGuardadoDTO> listaProductoGuardadoDTO;
 
-	 // Convierte una entidad a un objeto DTO
+	// Convierte una entidad a un objeto DTO
     public static UsuarioDTO convertToDTO(Usuario usuario) {
     	
     	if (usuario == null) {

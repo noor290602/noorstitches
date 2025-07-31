@@ -83,3 +83,10 @@ CREATE TABLE productos_guardados (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
     FOREIGN KEY (id_producto) REFERENCES productos(id)
 );
+
+-- Tabla sessiones para cookies
+CREATE TABLE sessions (
+	id VARCHAR(100) PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES usuarios(id)
+);

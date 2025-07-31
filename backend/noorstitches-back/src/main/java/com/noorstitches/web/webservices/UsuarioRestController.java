@@ -2,6 +2,7 @@ package com.noorstitches.web.webservices;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.noorstitches.model.dto.LineaPedidoDTO;
 import com.noorstitches.model.dto.PedidoDTO;
 import com.noorstitches.model.dto.UsuarioDTO;
+import com.noorstitches.repository.dao.SessionRepository;
+import com.noorstitches.repository.entity.Session;
 import com.noorstitches.repository.entity.Usuario;
 import com.noorstitches.service.PedidoService;
 import com.noorstitches.service.UsuarioService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -41,6 +46,9 @@ public class UsuarioRestController {
 	
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private SessionRepository sessionRepository;
 	
 	// Listar los usuarios 
 	 @GetMapping("")
@@ -146,16 +154,34 @@ public class UsuarioRestController {
 	 
 	 //Login usuario
 	 @PostMapping("/login")
-	 public ResponseEntity<UsuarioDTO> login(@RequestBody UsuarioDTO usuarioDTO) {
+	 public ResponseEntity<UsuarioDTO> login(@RequestBody UsuarioDTO usuarioDTO, HttpServletResponse response) {
 	     String email = usuarioDTO.getEmail();
 	     String password = usuarioDTO.getPassword();
 
 	     UsuarioDTO usuarioBuscadoDTO = usuarioService.findByEmail(email);
 
 	     if (usuarioBuscadoDTO != null && passwordEncoder.matches(password, usuarioBuscadoDTO.getPassword())) {
+	    	 Session session = new Session();
+	         session.setId(UUID.randomUUID().toString()); // genera ID único
+	         session.setIdUser(usuarioBuscadoDTO.getId());
+	         sessionRepository.save(session);
 	         return new ResponseEntity<>(usuarioBuscadoDTO, HttpStatus.OK);
 	     } else {
 	         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 	     }
 	 }
+	 
+	 /*
+	 //Cookies
+	 @GetMapping("/change-username")
+	 public String setCookie(HttpServletResponse response) {
+	     // create a cookie
+	     Cookie cookie = new Cookie("username", "Jovan");
+
+	     //add cookie to response
+	     response.addCookie(cookie);
+
+	     return "Username is changed!";
+	 }
+	 */
 }
